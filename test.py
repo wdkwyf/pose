@@ -2,14 +2,36 @@ import scipy.io as scio
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+import open3d as o3
 import matplotlib.image as mpimg
 
 rgb_file = 'rgb_1_0000001.png'
 depth_file = 'depth_1_0000001.png'
-rgb = cv2.imread(rgb_file, cv2.IMREAD_UNCHANGED)
-depth = cv2.imread(depth_file)
-image = np.concatenate([rgb, depth], axis=1)
-cv2.imshow('image', image)
+color_raw = o3.read_image(rgb_file)
+d1 = cv2.imread(depth_file)
+ans = d1[:, :, 0] + d1[:, :, 1]
+ans.astype(np.uint16)
+depth_raw = o3.Image(ans)
+rgbd_image = o3.create_rgbd_image_from_color_and_depth(color_raw, depth_raw)
+print rgbd_image
+plt.subplot(1, 3, 1)
+plt.title('rgb image')
+plt.imshow(color_raw)
+plt.subplot(1, 3, 2)
+plt.title('color image')
+plt.imshow(rgbd_image.color)
+plt.subplot(1, 3, 3)
+plt.title('depth image')
+plt.imshow(rgbd_image.depth)
+plt.show()
+
+pcd = o3.create_point_cloud_from_rgbd_image(rgbd_image, o3.PinholeCameraIntrinsic(
+    o3.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
+# Flip it, otherwise the pointcloud will be upside down
+pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+o3.draw_geometries([pcd])
+# image = np.concatenate([rgb, depth], axis=1)
+# cv2.imshow('image', image)
 key = cv2.waitKey(0)
 key &= 255
 if key == 27 or key == ord('q'):

@@ -11,18 +11,26 @@ for n, line in enumerate(test_data, 1):
     x = np.array(line)
     x = x.astype(np.float64)
     x = x.reshape(-1, 3)
+    x[:, 1] = -1 * x[:, 1]
+    # x[:, 1] = np.negative(x[:, 1])
+    print 'ok'
     # img = mpimg.imread('/home/yufei/PycharmProjects/pose/depth_1_0000001.png')
     # imgplot = plt.imshow(img)
-    plt.scatter(x[:, 0], x[:, 1])
 
-    plt.show()
+    # plt.show()
 
 print("Let\'s draw a cubic that consists of 8 points and 12 lines")
 points = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0],
           [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]]
-lines = [[0, 1], [0, 2], [1, 3], [2, 3],
-         [4, 5], [4, 6], [5, 7], [6, 7],
-         [0, 4], [1, 5], [2, 6], [3, 7]]
+points = x
+plt.scatter(points[:, 0], x[:, 1])
+n = np.arange(14)
+for i, txt in enumerate(n):
+    plt.annotate(txt, (points[i, 0], points[i, 1]))
+
+plt.show()
+lines = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [11, 1], [12, 10], [13, 3], [13, 5], [13, 7], [13, 11], [13, 12],
+         [10, 9], [11, 12]]
 colors = [[1, 0, 0] for i in range(len(lines))]
 line_set = o3.LineSet()
 line_set.points = o3.Vector3dVector(points)
